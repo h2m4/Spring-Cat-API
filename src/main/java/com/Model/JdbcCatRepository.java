@@ -1,6 +1,7 @@
 package com.Model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -10,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+@Slf4j
 @Repository
 public class JdbcCatRepository {
 
@@ -30,6 +32,7 @@ public class JdbcCatRepository {
     }
 
     public Cat findCatById(int id) {
+        log.info("finding cat by id: "+id);
         return jdbc.queryForObject("select * from cat where id=?", JdbcCatRepository::mapRowToCat, id);
     }
 
@@ -45,9 +48,13 @@ public class JdbcCatRepository {
 //                cat.getName(), cat.getGender(), cat.isLongHaired(), cat.isRoundFace(), cat.isLively(), cat.getPicPath(), cat.getThPicPath());
     }
 
-    public static Cat mapRowToCat(ResultSet rs, int rowNum) throws SQLException {
+    public Cat findLatestCat() {
+        Cat cat = jdbc.queryForObject("select * from cat order by id desc limit 1", JdbcCatRepository::mapRowToCat);
+        return cat;
+    }
 
-        return new Cat(rs.getInt("id"),
+    public static Cat mapRowToCat(ResultSet rs, int rowNum) throws SQLException {
+        return new Cat(
                 rs.getString("name"),
                 rs.getString("gender"),
                 rs.getBoolean("longHaired"),

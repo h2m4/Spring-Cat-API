@@ -4,6 +4,7 @@ import com.Controller.CatController;
 import com.Model.Cat;
 import com.Model.JdbcCatRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +27,13 @@ public class CatControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    //
+    // mock the bean, to focus test on mockMvc
     @MockBean
     private JdbcCatRepository catRepository;
 
     @Test
     public void getCatById() throws Exception {
-        when(catRepository.findCatById(1)).thenReturn(new Cat(1,"Lucy", "female",
+        when(catRepository.findCatById(1)).thenReturn(new Cat("Lucy", "female",
                 true, false, false,
                 "../static/images/cat1.jpeg", "images/cat1.jpeg"));
 
@@ -40,7 +41,7 @@ public class CatControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Lucy"));
     }
 
     @Test
